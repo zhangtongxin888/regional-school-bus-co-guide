@@ -1,0 +1,5 @@
+User-Agent: *
+Allow: /
+
+Host: https://regionalschoolbusco.wiki
+Sitemap: https://regionalschoolbusco.wiki/sitemap.xml
