@@ -1,0 +1,21 @@
+/* Additions for the 2026-10-01 content round (tables, notices, status labels). */
+.notice-card{border:2px solid var(--soil);background:#f7c94833;border-radius:8px;padding:22px 26px;margin:0 0 28px;box-shadow:5px 5px #7a482e24}
+.notice-card strong.kicker{display:block;color:var(--soil);font-family:var(--font-geist-mono),monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;margin-bottom:8px}
+.notice-card h2,.notice-card h3{margin:0 0 10px;font-family:Georgia,serif;font-size:clamp(22px,2.4vw,30px);line-height:1.15}
+.notice-card p{margin:0 0 10px;font-size:16px;line-height:1.7;color:var(--ink)}
+.notice-card a.button{margin-top:6px}
+.home-notice{padding:34px 0 0}
+.table-wrap{overflow-x:auto;margin:0 0 24px;border:1px solid var(--line);border-radius:6px;background:var(--paper-light)}
+table.data-table{width:100%;border-collapse:collapse;font-size:15px;line-height:1.5}
+table.data-table th,table.data-table td{padding:10px 12px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top}
+table.data-table th{background:#112f490d;font-family:var(--font-geist-mono),monospace;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--leaf-dark)}
+table.data-table tr:last-child td{border-bottom:0}
+.guide-article ul.plain,.guide-article ol.steps{margin:0 0 22px;padding-left:22px;color:#3f5140;font-size:16px;line-height:1.75}
+.guide-article ol.steps li,.guide-article ul.plain li{margin-bottom:8px}
+.tag{display:inline-block;padding:1px 8px;border-radius:99px;font-family:var(--font-geist-mono),monospace;font-size:11px;letter-spacing:.04em;text-transform:uppercase;border:1px solid currentColor;white-space:nowrap}
+.tag-ok{color:#1f6b3a}.tag-rep{color:#8a5a00}.tag-off{color:#8a2b1a}.tag-none{color:#5b6472}
+.updated-line{display:block;margin-top:10px;font-family:var(--font-geist-mono),monospace;font-size:12px;letter-spacing:.06em;color:var(--muted)}
+.stat-row{display:flex;flex-wrap:wrap;gap:10px;margin:14px 0 0;padding:0;list-style:none}
+.stat-row li{background:var(--paper-light);border:1px solid var(--line);border-radius:6px;padding:8px 12px;font-size:14px}
+.stat-row b{display:block;font-size:18px;color:var(--leaf-dark)}
+.guide-article ol.steps{list-style:decimal}.guide-article ul.plain{list-style:disc}
