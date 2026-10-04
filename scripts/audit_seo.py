@@ -10,6 +10,15 @@ locs = re.findall(r"<loc>(.*?)</loc>", sm)
 if len(re.findall(r"<lastmod>\d{4}-\d{2}-\d{2}</lastmod>", sm)) != len(locs): errs.append("sitemap: every url needs lastmod")
 robots = open(os.path.join(ROOT, "robots.txt")).read()
 if f"Sitemap: {SITE}/sitemap.xml" not in robots: errs.append("robots.txt missing sitemap")
+if re.search(r"(?im)^host:", robots): errs.append("robots.txt: non-standard Host directive (ignored/flagged by Google)")
+try:
+    import xml.etree.ElementTree as ET
+    _root = ET.fromstring(sm.encode("utf-8"))
+    if _root.tag != "{http://www.sitemaps.org/schemas/sitemap/0.9}urlset": errs.append(f"sitemap: unexpected root {_root.tag}")
+except ET.ParseError as e: errs.append(f"sitemap: invalid XML {e}")
+for l in locs:
+    if not l.startswith(SITE + "/") or not l.endswith("/"): errs.append(f"sitemap: loc not absolute https + trailing slash: {l}")
+if len(set(locs)) != len(locs): errs.append("sitemap: duplicate loc")
 def fpath(path):
     path = path.split("#")[0].split("?")[0]
     return os.path.join(ROOT, "index.html") if path in ("", "/") else os.path.join(ROOT, path.strip("/"), "index.html")
