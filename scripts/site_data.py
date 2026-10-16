@@ -7,8 +7,8 @@ list them as working (see scripts/test_site.py).
 """
 
 SITE = "https://regionalschoolbusco.wiki"
-CHECKED = "2026-10-01"          # content round date (UTC)
-CHECKED_HUMAN = "October 1, 2026"
+CHECKED = "2026-10-16"          # content round date (UTC)
+CHECKED_HUMAN = "October 16, 2026"
 
 GAME = {
     "name": "Regional School Bus Co",
