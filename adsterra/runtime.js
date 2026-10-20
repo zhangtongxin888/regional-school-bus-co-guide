@@ -7,7 +7,10 @@
    Local change (foreverago-wiki, theescapists3wiki): banners are queued until the previous
    banner script loads (upstream waited only 50 ms, so atOptions raced), and
    the top banner picks the widest variant allowed by the screen (upstream
-   always ended on the 320x50 entry). */
+   always ended on the 320x50 entry).
+   Local change (2026-10-18, shared by dressdesigner.wiki, impossibleanimalsroblox.wiki,
+   poke-survivor.wiki): Popunder capped at once per session; the session is
+   marked by a click only after the Popunder script has loaded. */
 (function () {
   "use strict";
 
@@ -140,6 +143,31 @@
     var script = document.createElement("script");
     script.id = id;
     script.async = true;
+    script.setAttribute("data-cfasync", "false");
+    script.src = url;
+    document.body.appendChild(script);
+  }
+
+  /* Popunder: at most once per browser session. The script is added only
+     while this session is unmarked. Clicks start marking the session only
+     after the Popunder script has finished loading (onload), so a click made
+     before it loads does not use up the session. A failed load never marks. */
+  var POP_KEY = "adsterra-popunder-session";
+  function popSessionUsed() {
+    try { return window.sessionStorage.getItem(POP_KEY) === "1"; } catch (e) { return false; }
+  }
+  function markPopSession() {
+    try { window.sessionStorage.setItem(POP_KEY, "1"); } catch (e) {}
+  }
+  function addPopunder(url) {
+    if (!url || popSessionUsed() || document.getElementById("adsterra-popunder")) return;
+    var script = document.createElement("script");
+    script.id = "adsterra-popunder";
+    script.async = true;
+    script.setAttribute("data-cfasync", "false");
+    script.addEventListener("load", function () {
+      document.addEventListener("click", markPopSession, { capture: true, once: true });
+    });
     script.src = url;
     document.body.appendChild(script);
   }
@@ -151,7 +179,7 @@
   if (visibleCount() > 3) return;
   mountSlots(slots);
   if (config.enablePopunder && config.popunderScriptUrl) {
-    addScript("adsterra-popunder", config.popunderScriptUrl);
+    addPopunder(config.popunderScriptUrl);
   }
   if (config.enableSocialBar && config.socialBarScriptUrl && visibleCount() < 3) {
     addScript("adsterra-social-bar", config.socialBarScriptUrl);
