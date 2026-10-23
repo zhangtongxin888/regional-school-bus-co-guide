@@ -8,9 +8,9 @@
    banner script loads (upstream waited only 50 ms, so atOptions raced), and
    the top banner picks the widest variant allowed by the screen (upstream
    always ended on the 320x50 entry).
-   Local change (2026-10-18, shared by dressdesigner.wiki, impossibleanimalsroblox.wiki,
-   poke-survivor.wiki): Popunder capped at once per session; the session is
-   marked by a click only after the Popunder script has loaded. */
+   Local change (2026-10-23, shared by every Adsterra Popunder site): Popunder
+   capped at 3 per visitor per local calendar day (localStorage). A page view
+   counts once, on its first click after the Popunder script has loaded. */
 (function () {
   "use strict";
 
@@ -148,25 +148,48 @@
     document.body.appendChild(script);
   }
 
-  /* Popunder: at most once per browser session. The script is added only
-     while this session is unmarked. Clicks start marking the session only
-     after the Popunder script has finished loading (onload), so a click made
-     before it loads does not use up the session. A failed load never marks. */
-  var POP_KEY = "adsterra-popunder-session";
-  function popSessionUsed() {
-    try { return window.sessionStorage.getItem(POP_KEY) === "1"; } catch (e) { return false; }
+  /* Popunder: at most POP_DAILY_MAX per visitor per local calendar day.
+     The Adsterra Popunder script, once loaded, opens a popunder on a user
+     click, so each page view that receives a click after the script loaded
+     is counted once. When today's count has reached the cap, the script is
+     not inserted at all, so no Popunder request is made. A click before the
+     script loads, or a failed load, never counts. The count lives in
+     localStorage as {"d":"YYYY-MM-DD","n":count} and resets on a new day.
+     If storage is unavailable the script is not loaded (fail closed). */
+  var POP_KEY = "adsterra-popunder-daily";
+  var POP_DAILY_MAX = 3;
+  function today() {
+    var d = new Date();
+    var m = d.getMonth() + 1;
+    var day = d.getDate();
+    return d.getFullYear() + "-" + (m < 10 ? "0" : "") + m + "-" + (day < 10 ? "0" : "") + day;
   }
-  function markPopSession() {
-    try { window.sessionStorage.setItem(POP_KEY, "1"); } catch (e) {}
+  function readPopCount() {
+    try {
+      var raw = JSON.parse(window.localStorage.getItem(POP_KEY) || "null");
+      if (raw && raw.d === today()) return Number(raw.n) || 0;
+      return 0;
+    } catch (e) {
+      return -1;
+    }
+  }
+  function countPop() {
+    try {
+      var n = readPopCount();
+      if (n < 0) n = 0;
+      window.localStorage.setItem(POP_KEY, JSON.stringify({ d: today(), n: n + 1 }));
+    } catch (e) {}
   }
   function addPopunder(url) {
-    if (!url || popSessionUsed() || document.getElementById("adsterra-popunder")) return;
+    if (!url || document.getElementById("adsterra-popunder")) return;
+    var used = readPopCount();
+    if (used < 0 || used >= POP_DAILY_MAX) return;
     var script = document.createElement("script");
     script.id = "adsterra-popunder";
     script.async = true;
     script.setAttribute("data-cfasync", "false");
     script.addEventListener("load", function () {
-      document.addEventListener("click", markPopSession, { capture: true, once: true });
+      document.addEventListener("click", countPop, { capture: true, once: true });
     });
     script.src = url;
     document.body.appendChild(script);
